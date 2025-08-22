@@ -8,7 +8,7 @@ export const generateVideo = async (params: GenerateVideoParams): Promise<string
   const { prompt, referenceImage, apiKey, modelId } = params;
 
   if (!apiKey) {
-    throw new Error("API Key is not provided. Please set it in the application.");
+    throw new Error("Kunci API tidak disediakan. Silakan atur di aplikasi.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
@@ -43,18 +43,18 @@ export const generateVideo = async (params: GenerateVideoParams): Promise<string
     }
 
     if (operation.error) {
-       throw new Error(`Video generation failed: ${operation.error.message}`);
+       throw new Error(`Pembuatan video gagal: ${operation.error.message}`);
     }
 
     const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
     if (!downloadLink) {
-      throw new Error("Video generation completed, but no download link was found.");
+      throw new Error("Pembuatan video selesai, tetapi tidak ada tautan unduhan yang ditemukan.");
     }
 
     // Fetch the video data using the provided URI and API key
     const videoResponse = await fetch(`${downloadLink}&key=${apiKey}`);
     if (!videoResponse.ok) {
-      throw new Error(`Failed to download video file. Status: ${videoResponse.statusText}`);
+      throw new Error(`Gagal mengunduh file video. Status: ${videoResponse.statusText}`);
     }
     
     const videoBlob = await videoResponse.blob();
@@ -62,8 +62,8 @@ export const generateVideo = async (params: GenerateVideoParams): Promise<string
   } catch (error) {
     console.error("Error in generateVideo service:", error);
     if (error instanceof Error) {
-        throw new Error(`Failed to generate video: ${error.message}`);
+        throw new Error(`Gagal membuat video: ${error.message}`);
     }
-    throw new Error("An unknown error occurred during video generation.");
+    throw new Error("Terjadi kesalahan tak dikenal saat pembuatan video.");
   }
 };

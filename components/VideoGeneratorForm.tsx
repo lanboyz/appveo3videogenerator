@@ -28,7 +28,7 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       if (!prompt.trim()) {
-        alert("Please enter a prompt.");
+        alert("Harap masukkan prompt.");
         return;
       }
       onGenerate({ prompt, referenceImage, aspectRatio, soundEnabled, resolution, modelId });
@@ -38,13 +38,13 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
       <form ref={ref} onSubmit={handleSubmit} className="space-y-6">
         <GlassCard>
           <label htmlFor="prompt" className="block text-lg font-semibold text-blue-800 mb-2">
-            Your Creative Prompt
+            Prompt Kreatif Anda
           </label>
           <textarea
             id="prompt"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="e.g., A neon hologram of a cat driving a futuristic car at top speed on a rainbow road..."
+            placeholder="misalnya, Sebuah hologram neon kucing mengendarai mobil futuristik dengan kecepatan tinggi di jalan pelangi..."
             className="w-full h-32 p-4 bg-white/50 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 placeholder-blue-400 text-blue-900 resize-none"
             disabled={isLoading || !isApiKeySet}
           />
@@ -52,11 +52,11 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <GlassCard className="flex flex-col">
-            <h3 className="text-lg font-semibold text-blue-800 mb-3">Reference Image (Optional)</h3>
+            <h3 className="text-lg font-semibold text-blue-800 mb-3">Gambar Referensi (Opsional)</h3>
             <ImageUploader onImageUpload={setReferenceImage} disabled={isLoading || !isApiKeySet} />
           </GlassCard>
           <GlassCard>
-              <h3 className="text-lg font-semibold text-blue-800 mb-4">Video Settings</h3>
+              <h3 className="text-lg font-semibold text-blue-800 mb-4">Pengaturan Video</h3>
               <div className="space-y-4">
                  <div>
                       <span className="block text-sm font-medium text-blue-700 mb-2">Model</span>
@@ -72,7 +72,7 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
                       </div>
                   </div>
                   <div>
-                      <span className="block text-sm font-medium text-blue-700 mb-2">Aspect Ratio</span>
+                      <span className="block text-sm font-medium text-blue-700 mb-2">Rasio Aspek</span>
                       <div className="flex gap-2">
                           {(['16:9', '9:16'] as AspectRatio[]).map(ratio => (
                               <button type="button" key={ratio} onClick={() => setAspectRatio(ratio)}
@@ -84,7 +84,7 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
                       </div>
                   </div>
                   <div>
-                      <span className="block text-sm font-medium text-blue-700 mb-2">Resolution</span>
+                      <span className="block text-sm font-medium text-blue-700 mb-2">Resolusi</span>
                        <div className="flex gap-2">
                           {(['720p', '1080p'] as Resolution[]).map(res => (
                               <button type="button" key={res} onClick={() => setResolution(res)}
@@ -96,7 +96,7 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
                       </div>
                   </div>
                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-sm font-medium text-blue-700">Enable Sound</span>
+                      <span className="text-sm font-medium text-blue-700">Aktifkan Suara</span>
                        <button type="button" onClick={() => setSoundEnabled(!soundEnabled)} disabled={isLoading || !isApiKeySet}
                           className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${soundEnabled ? 'bg-blue-500' : 'bg-blue-200'}`}>
                           <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${soundEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -114,18 +114,18 @@ const VideoGeneratorForm = forwardRef<HTMLFormElement, VideoGeneratorFormProps>(
           {isLoading ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Generating...</span>
+              <span>Sedang Membuat...</span>
             </>
           ) : (
             isApiKeySet ? (
               <>
                 <FilmIcon />
-                <span>Generate Video</span>
+                <span>Buat Video</span>
               </>
             ) : (
                <>
                 <KeyIcon />
-                <span>Set API Key to Generate</span>
+                <span>Atur Kunci API untuk Membuat</span>
               </>
             )
           )}

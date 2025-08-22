@@ -2,11 +2,15 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import VideoGeneratorForm from './components/VideoGeneratorForm';
 import VideoPreview from './components/VideoPreview';
 import ApiKeyInput from './components/ApiKeyInput';
+import SplashScreen from './components/SplashScreen';
+import Clock from './components/Clock';
+import Notification from './components/Notification';
 import { generateVideo } from './services/geminiService';
 import type { GenerateVideoParams } from './types';
 import { LOADING_MESSAGES } from './constants';
 
 const App: React.FC = () => {
+  const [userName, setUserName] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
   const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -15,11 +19,17 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [previewAspectRatio, setPreviewAspectRatio] = useState('16/9');
   const [generationCount, setGenerationCount] = useState<number>(0);
+  const [notification, setNotification] = useState<{ message: string; type: 'warning' | 'error' } | null>(null);
   
   const previewRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
   useEffect(() => {
+    const storedName = localStorage.getItem('userName');
+    if (storedName) {
+      setUserName(storedName);
+    }
+
     const storedApiKey = localStorage.getItem('gemini-api-key');
     if (storedApiKey) {
       setApiKey(storedApiKey);
@@ -27,14 +37,28 @@ const App: React.FC = () => {
     } else {
       setShowApiKeyInput(true);
     }
+    
+    const storedCount = localStorage.getItem('generationCount');
+    if (storedCount) {
+        setGenerationCount(parseInt(storedCount, 10));
+    }
   }, []);
+
+  const handleLogin = (name: string) => {
+    localStorage.setItem('userName', name);
+    setUserName(name);
+  };
 
   const handleApiKeySave = (newKey: string) => {
     setApiKey(newKey);
     localStorage.setItem('gemini-api-key', newKey);
     setShowApiKeyInput(false);
     
-    // Scroll to the generate form after the input is hidden
+    // Atur ulang jumlah pembuatan untuk kunci baru
+    setGenerationCount(0);
+    localStorage.setItem('generationCount', '0');
+    setNotification(null); // Hapus notifikasi batas apa pun
+
     setTimeout(() => {
         formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
@@ -42,9 +66,27 @@ const App: React.FC = () => {
 
   const handleGenerateVideo = useCallback(async (params: Omit<GenerateVideoParams, 'apiKey'>) => {
     if (!apiKey) {
-      setError('Please set your Google Gemini API Key first.');
+      setError('Silakan atur Kunci API Google Gemini Anda terlebih dahulu.');
       setShowApiKeyInput(true);
       return;
+    }
+
+    // Blokir pembuatan jika batas tercapai
+    if (generationCount >= 10) {
+        setNotification({
+            message: 'Batas 10 kali pembuatan video telah tercapai. Harap masukkan Kunci API yang baru.',
+            type: 'error',
+        });
+        setShowApiKeyInput(true);
+        return;
+    }
+
+    // Peringatkan pengguna pada percobaan terakhir mereka
+    if (generationCount === 9) {
+        setNotification({
+            message: 'Ini adalah pembuatan video terakhir Anda. Setelah ini, Anda memerlukan Kunci API baru.',
+            type: 'warning',
+        });
     }
 
     setIsLoading(true);
@@ -61,18 +103,31 @@ const App: React.FC = () => {
     }, 3000);
 
     try {
-      setLoadingMessage('Initializing video generation...');
+      setLoadingMessage('Memulai pembuatan video...');
       const videoUrl = await generateVideo({ ...params, apiKey });
       setGeneratedVideoUrl(videoUrl);
-      setGenerationCount(prevCount => prevCount + 1);
+      
+      const newCount = generationCount + 1;
+      setGenerationCount(newCount);
+      localStorage.setItem('generationCount', newCount.toString());
+      
+      // Beri tahu pengguna setelah pembuatan ke-10 selesai
+      if (newCount === 10) {
+        setNotification({
+            message: 'Anda telah mencapai batas 10 pembuatan video. Harap gunakan Kunci API baru untuk melanjutkan.',
+            type: 'error'
+        });
+        setApiKey('');
+        localStorage.removeItem('gemini-api-key');
+        setShowApiKeyInput(true);
+      }
     } catch (err) {
       console.error(err);
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+      const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan yang tidak diketahui.';
       
-      // Check for potential API key errors and reset
       const isApiKeyError = /API Key|permission denied|quota|400|403/i.test(errorMessage);
       if (isApiKeyError) {
-        setError('API Key is invalid or has reached its limit. Please enter a new one.');
+        setError('Kunci API tidak valid atau telah mencapai batasnya. Silakan masukkan yang baru.');
         setApiKey('');
         localStorage.removeItem('gemini-api-key');
         setShowApiKeyInput(true);
@@ -84,18 +139,30 @@ const App: React.FC = () => {
       clearInterval(messageInterval);
       setLoadingMessage('');
     }
-  }, [apiKey]);
+  }, [apiKey, generationCount]);
+
+  if (!userName) {
+    return <SplashScreen onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-sky-100 to-blue-200 text-blue-900 font-sans p-4 sm:p-8 flex flex-col items-center">
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onDismiss={() => setNotification(null)}
+        />
+      )}
       <div className="w-full max-w-4xl mx-auto flex flex-col flex-1">
         <header className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-500 drop-shadow-sm">
-            VEO-3 Video Generator
+            Generator Video VEO-3
           </h1>
           <p className="text-blue-500 mt-2 text-lg">
-            Bring your ideas to life with AI-powered video creation.
+            Selamat datang, <span className="font-semibold">{userName}</span>! Wujudkan ide-ide Anda.
           </p>
+          <Clock />
         </header>
 
         <main className="w-full space-y-8">
@@ -124,7 +191,7 @@ const App: React.FC = () => {
         </main>
         
         <footer className="text-center mt-auto py-4 text-blue-500 text-sm">
-          <p>@2025 VEO 3 VIDEO GENERATOR by LANBOY</p>
+          <p>@2025 GENERATOR VIDEO VEO 3 oleh LANBOY</p>
         </footer>
       </div>
     </div>

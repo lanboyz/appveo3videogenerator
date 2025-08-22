@@ -14,7 +14,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, disabled }
     if (file) {
       // Check for valid file types
       if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-        alert('Invalid file type. Please upload a PNG, JPG, or WEBP image.');
+        alert('Tipe file tidak valid. Harap unggah gambar PNG, JPG, atau WEBP.');
         return;
       }
       const reader = new FileReader();
@@ -42,7 +42,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, disabled }
             onClick={removeImage}
             className="absolute -top-2 -right-2 bg-white/80 backdrop-blur-sm text-blue-600 rounded-full p-1 shadow-md hover:bg-blue-100 disabled:opacity-50"
             disabled={disabled}
-            aria-label="Remove image"
+            aria-label="Hapus gambar"
           >
             <XIcon />
           </button>
@@ -52,7 +52,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, disabled }
           <div className="text-blue-500 mx-auto">
             <UploadIcon />
           </div>
-          <p className="mt-1 text-sm font-semibold text-blue-700">Click to upload</p>
+          <p className="mt-1 text-sm font-semibold text-blue-700">Klik untuk mengunggah</p>
           <p className="text-xs text-blue-500">PNG, JPG, WEBP</p>
           <input
             id="image-upload"

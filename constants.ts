@@ -10,12 +10,12 @@ export const VEO_MODEL_CHOICES = [
 
 
 export const LOADING_MESSAGES = [
-  'Warming up the AI model...',
-  'Analyzing your prompt and reference image...',
-  'Generating initial video frames...',
-  'This can take a few minutes, please be patient.',
-  'Stitching scenes together...',
-  'Adding digital pixie dust...',
-  'Rendering the final video...',
-  'Almost there, polishing the masterpiece!',
+  'Memanaskan model AI...',
+  'Menganalisis prompt dan gambar referensi Anda...',
+  'Membuat frame video awal...',
+  'Ini bisa memakan waktu beberapa menit, harap bersabar.',
+  'Menyambungkan adegan...',
+  'Menambahkan debu peri digital...',
+  'Merender video final...',
+  'Hampir selesai, memoles mahakarya!',
 ];
